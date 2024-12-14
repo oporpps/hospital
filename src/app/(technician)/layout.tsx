@@ -4,8 +4,8 @@ import { Noto_Sans_Thai } from 'next/font/google';
 import Layout from "@/containers/(technician)/layout";
 import { ToastContainer } from "react-toastify";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect, RedirectType } from "next/navigation";
+import { authOptions } from "@/utils/authOptions";
 
 export const metadata: Metadata = {
     title: "Create Next App",
