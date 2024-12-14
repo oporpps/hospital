@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  role      UserRole
+  fullname  String
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ครุภัณฑ์
+model Equipment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  idCal       String   @unique // ID ครุภัณฑ์
+  equipmentId String   @unique // หมายเลขครุภัณฑ์
+  bms         String // ยี่ห้อ/รุ่น/ขนาด
+  serialNo    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Issue       Issue[]
+}
+
+// หน่วยงาน
+model Agency {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  name   String // ชื่อหน่วยงาน
+  number String // หมายเลขหน่วยงาน
+  Issue  Issue[]
+}
+
+// รายงานแจ้งซ่อม
+model Issue {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  jobId       String      @unique
+  title       String // หัวข้อการแจ้งซ่อม
+  cause       String // สาเหตุ/อาการ
+  // phoneNumber String // เบอร์โทรติดต่อกลับ
+  informer    String // ผู้แจ้งซ่อม
+  status      IssueStatus @default(PENDING) // สถานะการดำเนินงาน
+  equipmentId String      @db.ObjectId // Foreign key สำหรับ Equipment
+  agencyId    String      @db.ObjectId // Foreign key สำหรับ Agency
+  equipment   Equipment   @relation(fields: [equipmentId], references: [id]) // ความสัมพันธ์กับ Equipment
+  agency      Agency      @relation(fields: [agencyId], references: [id]) // ความสัมพันธ์กับ Agency
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  TECHNICIAN
+}
+
+enum IssueStatus {
+  PENDING // รอดำเนินการ
+  IN_PROGRESS // กำลังดำเนินการ
+  DONE // เสร็จสิน
+}
