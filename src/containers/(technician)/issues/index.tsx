@@ -13,6 +13,12 @@ import {
     Spinner,
     ChipProps,
     Chip,
+    useDisclosure,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
 } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -21,6 +27,7 @@ import { formatDateTime } from "@/utils/format";
 import { fetcher } from "@/utils/fetch";
 import { Issue } from "@prisma/client";
 import { LuPencilLine } from "react-icons/lu";
+import { toast } from "react-toastify";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
     DONE: "success",
@@ -42,7 +49,48 @@ export default function Issues() {
         return data?.data.count ? Math.ceil(data.data.count / rowsPerPage) : 0;
     }, [data?.data.count, rowsPerPage]);
 
-    const loadingState = isLoading || data?.data.results.length === 0 ? "loading" : "idle";
+    const loadingState = isLoading ? "loading" : "idle";
+
+    const { isOpen, onOpen, onOpenChange,onClose } = useDisclosure();
+    
+    const handleDelete = async (id: string) => {
+        const promise = fetch("/api/issues/remove", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({id}),
+                })
+                    .then(async (response) => {
+                        const result = await response.json();
+                        if (response.ok) {
+                            return result.message || 'ลบข้อมูลสำเร็จ';
+                        } else {
+                            throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบข้อมูล');
+                        }
+                    })
+                    .catch((error) => {
+                        throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบข้อมูล');
+                    });
+        
+                toast.promise(
+                    promise,
+                    {
+                        pending: "กำลังลบบันทึกการแจ้งซ่อม...",
+                        success: {
+                            render({ data }) {
+                                return data;
+                            }
+                        },
+                        error: {
+                            render({ data } : any) {
+                                return data.message;
+                            }
+                        }
+                    }
+                );
+        
+    }
 
     return (
         <div className="flex flex-col gap-3">
@@ -108,7 +156,8 @@ export default function Issues() {
                                                 </span>
                                             </Tooltip>
                                             <Tooltip content="ลบ">
-                                                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                <span
+                                                    className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>handleDelete(v.id)}>
                                                     <FaRegTrashAlt />
                                                 </span>
                                             </Tooltip>

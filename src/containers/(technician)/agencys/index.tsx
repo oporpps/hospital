@@ -34,7 +34,7 @@ export default function Agencys() {
         return data?.data.count ? Math.ceil(data.data.count / rowsPerPage) : 0;
     }, [data?.data.count, rowsPerPage]);
 
-    const loadingState = isLoading || data?.data.results.length === 0 ? "loading" : "idle";
+    const loadingState = isLoading ? "loading" : "idle";
 
     return (
         <div className="flex flex-col gap-3">

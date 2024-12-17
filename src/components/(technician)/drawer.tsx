@@ -31,7 +31,6 @@ export default function Drawer() {
                     <Link href="/technician" className="text-white" size="lg">งานที่รอดำเนินการ</Link>
                     <Link href="/technician/equipment" className="text-white" size="lg">จัดการครุภัณฑ์</Link>
                     <Link href="/technician/agency" className="text-white" size="lg">จัดการหน่วยงาน</Link>
-                    <Link href="/technician/addinfo" className="text-white" size="lg">เพิ่มข้อมูล</Link>
                 </CardBody>
             </Card>
         </>
