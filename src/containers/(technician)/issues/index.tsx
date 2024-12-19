@@ -157,7 +157,13 @@ export default function Issues() {
                                             </Tooltip>
                                             <Tooltip content="ลบ">
                                                 <span
-                                                    className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>handleDelete(v.id)}>
+                                                    className="text-lg text-danger cursor-pointer active:opacity-50"
+                                                    onClick={() => {
+                                                        if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?")) {
+                                                            handleDelete(v.id);
+                                                        }
+                                                    }}
+                                                >
                                                     <FaRegTrashAlt />
                                                 </span>
                                             </Tooltip>

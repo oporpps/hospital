@@ -13,6 +13,13 @@ import {
     Spinner,
     ChipProps,
     Chip,
+    useDisclosure,
+    Button,
+    Modal,
+    ModalFooter,
+    ModalBody,
+    ModalContent,
+    ModalHeader,
 } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
 import useSWR from 'swr'
@@ -42,6 +49,8 @@ export default function Issues() {
 
     const loadingState = isLoading ? "loading" : "idle";
 
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    
     return (
         <div className="flex flex-col gap-3">
             <Table
@@ -93,14 +102,31 @@ export default function Issues() {
                                     </TableCell>
                                     <TableCell className="text-base">{formatDateTime(v.createdAt)}</TableCell>
                                     <TableCell className="text-base"><></></TableCell>
-                                    <TableCell>
-                                        <div className="relative flex items-center gap-2">
-                                            <Tooltip content="ดูรายละเอียด">
-                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                    <FaRegEye />
-                                                </span>
-                                            </Tooltip>
-                                        </div>
+                                    <TableCell className="text-base">
+                                        <Button onPress={onOpen} size="sm"><FaRegEye /></Button>
+                                        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                                            <ModalContent>
+                                                {(onClose) => (
+                                                    <>
+                                                        <ModalHeader className="flex flex-col gap-2">รายละเอียด</ModalHeader>
+                                                        <ModalBody>
+                                                            <p>หมายเลขงาน:{v.jobId}</p>
+                                                            <p>หัวข้อการแจ้งซ่อม:{v.title}</p>
+                                                            <p>อาการ/สาเหตุ:{v.cause}</p>
+                                                            <p>หน่วยงาน:{(v as any).agency.name}</p>
+                                                            <p>ผู้แจ้งซ่อม:{v.informer}</p>
+                                                            <p>วันแจ้งซ่อม:{formatDateTime(v.createdAt)}</p>
+                                                            <p>สถานะ:{v.status}</p>
+                                                        </ModalBody>
+                                                        <ModalFooter>
+                                                            <Button color="danger" variant="light" onPress={onClose}>
+                                                                ปิด
+                                                            </Button>
+                                                        </ModalFooter>
+                                                    </>
+                                                )}
+                                            </ModalContent>
+                                        </Modal>
                                     </TableCell>
                                 </TableRow>
                             );
