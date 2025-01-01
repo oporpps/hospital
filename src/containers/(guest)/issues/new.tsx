@@ -154,7 +154,7 @@ export default function NewIssue({ agency, init }: { agency: Array<Agency>, init
                     />
 
                     <Select
-                        // isRequired
+                        isRequired
                         label="หน่วยงาน"
                         labelPlacement="outside"
                         placeholder="กรุณาเลือกหน่วยงาน"

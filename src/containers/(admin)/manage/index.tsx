@@ -1,39 +1,19 @@
 "use client"
-
-import React, { useMemo, useState } from "react";
-import {
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Tooltip,
-    Pagination,
-    Spinner,
-    Button,
-    useDisclosure,
-    Form,
-    ModalBody,
-    ModalContent,
-    Modal,
-    Input,
-    ModalHeader,
-} from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Modal, ModalContent, ModalHeader, ModalBody, Form, Input, Pagination, Spinner, Tooltip, useDisclosure } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
-import { Agency } from "@prisma/client";
 import useSWR,{mutate} from "swr";
+import React, { useMemo, useState } from "react";
 import { fetcher } from "@/utils/fetch";
-import { formatDateTime } from "@/utils/format";
+import { User } from "@prisma/client";
 import { LuPencilLine } from "react-icons/lu";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-export default function Agencys() {
+export default function Manage() {
 
     const [page, setPage] = useState<number>(1);
 
-    const { data, isLoading } = useSWR(`/api/technician/agencys?page=${page}`, fetcher, {
+    const { data, isLoading } = useSWR(`/api/admin/technician?page=${page}`, fetcher, {
         keepPreviousData: true,
     });
 
@@ -49,71 +29,73 @@ export default function Agencys() {
 
     const handleSubmit = async (formData: FormData) => {
 
-        const name = formData.get("name") as string; // Access form fields
-        const number = formData.get("number") as string;
+        const fullname = formData.get("fullname") as string; // Access form fields
+        const username = formData.get("username") as string;
+        const password = formData.get("password") as string;
 
-        const response = await fetch('/api/agency/new', {
+        const response = await fetch('/api/admin/technician/new', {
             method: 'POST',
             body: JSON.stringify({
-                name,
-                number,
+                fullname,
+                username,
+                password,
             })
         })
         const data = await response.json()
         console.log(data);
-        mutate(`/api/technician/agencys?page=${page}`)
+        mutate(`/api/admin/technician?page=${page}`)
         onClose()
     }
     const handleDelete = async (id: string) => {
-        const promise = fetch("/api/agency/remove", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then(async (response) => {
-                const result = await response.json();
-                if (response.ok) {
-                    return result.message || 'ลบหน่วยงานสำเร็จ';
-                } else {
-                    throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
-                }
-            })
-            .catch((error) => {
-                throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
-            });
-
-        toast.promise(
-            promise,
-            {
-                pending: "กำลังลบหน่วยงาน...",
-                success: {
-                    render({ data }) {
-                        mutate(`/api/technician/agencys?page=${page}`)
-                        return data;
-                    }
+            const promise = fetch("/api/admin/technician/remove", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-                error: {
-                    render({ data }: any) {
-                        return data.message;
+                body: JSON.stringify({ id }),
+            })
+                .then(async (response) => {
+                    const result = await response.json();
+                    if (response.ok) {
+                        return result.message || 'ลบหน่วยงานสำเร็จ';
+                    } else {
+                        throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
+                    }
+                })
+                .catch((error) => {
+                    throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
+                });
+    
+            toast.promise(
+                promise,
+                {
+                    pending: "กำลังลบหน่วยงาน...",
+                    success: {
+                        render({ data }) {
+                            mutate(`/api/admin/technician?page=${page}`)
+                            return data;
+                        }
+                    },
+                    error: {
+                        render({ data }: any) {
+                            return data.message;
+                        }
                     }
                 }
-            }
-        );
-    }
-
+            );
+        }
     return (
+        
 
         <><div className="flex justify-end mb-4">
             <Button onPress={onOpen} color="success" variant="solid" className="text-white">
-                + เพิ่มหน่วยงาน
+                + เพิ่มช่าง
             </Button>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">เพิ่มหน่วยงาน</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">เพิ่มAccount</ModalHeader>
                             <ModalBody>
                                 <Form
                                     className="w-full flex flex-col gap-4 mb-4"
@@ -125,31 +107,43 @@ export default function Agencys() {
                                 >
                                     <Input
                                         isRequired
-                                        label="หมายเลขหน่วยงาน"
+                                        label="ชื่อ-นามสกุล"
                                         labelPlacement="outside"
-                                        name="number"
+                                        name="fullname"
                                         type="text"
                                         variant="bordered"
-                                        placeholder="หมายเลขหน่วยงาน"
+                                        placeholder="กำหนดเอง"
                                         errorMessage="กรุณากรอกข้อมูลในช่องนี้"
                                         size="lg"
                                     />
 
                                     <Input
                                         isRequired
-                                        label="ชื่อหน่วยงาน"
+                                        label="ชื่อผู้ใช้งาน"
                                         labelPlacement="outside"
-                                        name="name"
+                                        name="username"
                                         type="text"
                                         variant="bordered"
-                                        placeholder="ชื่อหน่วยงาน"
+                                        placeholder="กำหนดเอง"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+
+                                    <Input
+                                        isRequired
+                                        label="รหัสผ่าน"
+                                        labelPlacement="outside"
+                                        name="password"
+                                        type="password"
+                                        variant="bordered"
+                                        placeholder="กำหนดเอง"
                                         errorMessage="กรุณากรอกข้อมูลในช่องนี้"
                                         size="lg"
                                     />
 
                                     <div className="w-full">
                                         <Button color="success" type="submit" radius="sm" className="text-white w-full">
-                                            เพิ่มหน่วยงาน
+                                            สร้าง
                                         </Button>
                                     </div>
                                 </Form>
@@ -179,8 +173,9 @@ export default function Agencys() {
                     ) : null}
                 >
                     <TableHeader>
-                        <TableColumn className="text-base">หมายเลขหน่วยงาน</TableColumn>
-                        <TableColumn className="text-base">ชื่อหน่วยงาน</TableColumn>
+                        <TableColumn className="text-base">ชื่อ-นามสกุล</TableColumn>
+                        <TableColumn className="text-base">ชื่อผู้ใช้งาน</TableColumn>
+                        <TableColumn className="text-base">สิทธิ์การเข้าถึง</TableColumn>
                         <TableColumn><></></TableColumn>
                     </TableHeader>
                     <TableBody
@@ -188,11 +183,12 @@ export default function Agencys() {
                         loadingState={loadingState}
                         emptyContent={"ไม่มีข้อมูลที่จะแสดง"}
                     >
-                        {data?.data.results.map((v: Agency, i: number) => {
+                        {data?.data.results.map((v: User, i: number) => {
                             return (
                                 <TableRow key={i}>
-                                    <TableCell className="text-base">{v.number}</TableCell>
-                                    <TableCell className="text-base">{v.name}</TableCell>
+                                    <TableCell className="text-base">{v.fullname}</TableCell>
+                                    <TableCell className="text-base">{v.username}</TableCell>
+                                    <TableCell className="text-base">{v.role}</TableCell>
                                     <TableCell>
                                         <div className="relative flex items-center gap-2">
                                             <Tooltip content="ดูรายละเอียด">
@@ -225,6 +221,6 @@ export default function Agencys() {
                     </TableBody>
                 </Table>
             </div></>
+    
     );
 }
-

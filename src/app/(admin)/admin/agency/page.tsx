@@ -1,6 +1,6 @@
 "use server"
 
-import Agencys from "@/containers/(technician)/agencys";
+import Agencys from "@/containers/(admin)/agencys";
 
 export default async function Page() {
 

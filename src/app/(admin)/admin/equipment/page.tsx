@@ -1,6 +1,6 @@
 "use server"
 
-import Equipments from "@/containers/(technician)/equipments";
+import Equipments from "@/containers/(admin)/equipments";
 
 export default async function Page() {
 

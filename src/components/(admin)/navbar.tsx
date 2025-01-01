@@ -42,7 +42,7 @@ export default function Navbar() {
                                 <p className="font-semibold">เข้าสู่ระบบด้วยบัญชี</p>
                                 <p className="font-semibold">{data.user.username}</p>
                             </DropdownItem>
-                            <DropdownItem href="/technician" key="dashboard">แดชบอร์ด</DropdownItem>
+                            <DropdownItem href="/admin/manage" key="manage">จัดการ</DropdownItem>
                             <DropdownItem key="settings">การตั้งค่า</DropdownItem>
                             <DropdownItem key="logout" color="danger" onPress={async () => {signOut({ redirect: false });router.replace('/')}}>
                                 ออกจากระบบ

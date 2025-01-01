@@ -22,7 +22,7 @@ import {
 } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
-import useSWR from 'swr'
+import useSWR,{mutate} from "swr";
 import { formatDateTime } from "@/utils/format";
 import { fetcher } from "@/utils/fetch";
 import { Issue } from "@prisma/client";
@@ -79,6 +79,7 @@ export default function Issues() {
                         pending: "กำลังลบบันทึกการแจ้งซ่อม...",
                         success: {
                             render({ data }) {
+                                mutate(`/api/technician/issues?page=${page}`)
                                 return data;
                             }
                         },

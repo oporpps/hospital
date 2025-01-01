@@ -33,7 +33,7 @@ export default function Agencys() {
 
     const [page, setPage] = useState<number>(1);
 
-    const { data, isLoading } = useSWR(`/api/technician/agencys?page=${page}`, fetcher, {
+    const { data, isLoading } = useSWR(`/api/admin/get/agencys?page=${page}`, fetcher, {
         keepPreviousData: true,
     });
 
@@ -61,7 +61,7 @@ export default function Agencys() {
         })
         const data = await response.json()
         console.log(data);
-        mutate(`/api/technician/agencys?page=${page}`)
+        mutate(`/api/admin/get/agencys?page=${page}`)
         onClose()
     }
     const handleDelete = async (id: string) => {
@@ -90,7 +90,7 @@ export default function Agencys() {
                 pending: "กำลังลบหน่วยงาน...",
                 success: {
                     render({ data }) {
-                        mutate(`/api/technician/agencys?page=${page}`)
+                        mutate(`/api/admin/get/agencys?page=${page}`)
                         return data;
                     }
                 },

@@ -35,6 +35,12 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 
 export default function Issues() {
 
+    const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+    const handleOpenModal = (issue: Issue) => {
+        setSelectedIssue(issue); // กำหนด Issue ที่เลือก
+        onOpen(); // เปิด Modal
+    };
     const [page, setPage] = useState<number>(1);
 
     const { data, isLoading } = useSWR(`/api/issues?page=${page}`, fetcher, {
@@ -50,7 +56,7 @@ export default function Issues() {
     const loadingState = isLoading ? "loading" : "idle";
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    
+
     return (
         <div className="flex flex-col gap-3">
             <Table
@@ -97,36 +103,13 @@ export default function Issues() {
                                     <TableCell className="text-base">{v.cause}</TableCell>
                                     <TableCell className="text-base">
                                         <Chip color={statusColorMap[v.status]} size="sm" variant="flat" radius="sm">
-                                            { v.status === "PENDING" ? "รอดำเนินการ" : (v.status === "IN_PROGRESS" ? "กำลังดำเนินการ" : "เสร็จสิ้น") }
+                                            {v.status === "PENDING" ? "รอดำเนินการ" : (v.status === "IN_PROGRESS" ? "กำลังดำเนินการ" : "เสร็จสิ้น")}
                                         </Chip>
                                     </TableCell>
                                     <TableCell className="text-base">{formatDateTime(v.createdAt)}</TableCell>
                                     <TableCell className="text-base"><></></TableCell>
                                     <TableCell className="text-base">
-                                        <Button onPress={onOpen} size="sm"><FaRegEye /></Button>
-                                        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-                                            <ModalContent>
-                                                {(onClose) => (
-                                                    <>
-                                                        <ModalHeader className="flex flex-col gap-2">รายละเอียด</ModalHeader>
-                                                        <ModalBody>
-                                                            <p>หมายเลขงาน:{v.jobId}</p>
-                                                            <p>หัวข้อการแจ้งซ่อม:{v.title}</p>
-                                                            <p>อาการ/สาเหตุ:{v.cause}</p>
-                                                            <p>หน่วยงาน:{(v as any).agency.name}</p>
-                                                            <p>ผู้แจ้งซ่อม:{v.informer}</p>
-                                                            <p>วันแจ้งซ่อม:{formatDateTime(v.createdAt)}</p>
-                                                            <p>สถานะ:{v.status}</p>
-                                                        </ModalBody>
-                                                        <ModalFooter>
-                                                            <Button color="danger" variant="light" onPress={onClose}>
-                                                                ปิด
-                                                            </Button>
-                                                        </ModalFooter>
-                                                    </>
-                                                )}
-                                            </ModalContent>
-                                        </Modal>
+                                        <Button onPress={() => handleOpenModal(v)} size="sm"><FaRegEye /></Button>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -134,6 +117,34 @@ export default function Issues() {
                     }
                 </TableBody>
             </Table>
+            {selectedIssue && (
+                <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-2">รายละเอียด</ModalHeader>
+                                <ModalBody>
+                                    <p>หมายเลขงาน: {selectedIssue.jobId}</p>
+                                    <p>หัวข้อการแจ้งซ่อม: {selectedIssue.title}</p>
+                                    <p>อาการ/สาเหตุ: {selectedIssue.cause}</p>
+                                    <p>หน่วยงาน: {(selectedIssue as any).agency.name}</p>
+                                    <p>ผู้แจ้งซ่อม: {selectedIssue.informer}</p>
+                                    <p>วันแจ้งซ่อม: {formatDateTime(selectedIssue.createdAt)}</p>
+                                    <p>สถานะ: {selectedIssue.status}</p>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="danger" variant="light" onPress={() => {
+                                        onClose();
+                                        setSelectedIssue(null); // รีเซ็ต selectedIssue
+                                    }}>
+                                        ปิด
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+            )}
         </div>
     );
 }

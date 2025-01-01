@@ -13,15 +13,15 @@ import {
     Spinner,
     Button,
     useDisclosure,
-    Form,
-    ModalBody,
-    ModalContent,
     Modal,
-    Input,
+    ModalContent,
     ModalHeader,
+    ModalBody,
+    Form,
+    Input,
 } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
-import { Agency } from "@prisma/client";
+import { Equipment } from "@prisma/client";
 import useSWR,{mutate} from "swr";
 import { fetcher } from "@/utils/fetch";
 import { formatDateTime } from "@/utils/format";
@@ -29,11 +29,11 @@ import { LuPencilLine } from "react-icons/lu";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-export default function Agencys() {
+export default function Equipments() {
 
     const [page, setPage] = useState<number>(1);
 
-    const { data, isLoading } = useSWR(`/api/technician/agencys?page=${page}`, fetcher, {
+    const { data, isLoading } = useSWR(`/api/admin/get/equipments?page=${page}`, fetcher, {
         keepPreviousData: true,
     });
 
@@ -43,77 +43,78 @@ export default function Agencys() {
         return data?.data.count ? Math.ceil(data.data.count / rowsPerPage) : 0;
     }, [data?.data.count, rowsPerPage]);
 
-    const loadingState = isLoading ? "loading" : "idle";
+    const loadingState = isLoading  ? "loading" : "idle";
 
     const { isOpen, onOpen, onOpenChange,onClose } = useDisclosure();
-
+    
     const handleSubmit = async (formData: FormData) => {
+    
+            const idcal = formData.get("idcal") as string; // Access form fields
+            const equipmentid = formData.get("equipmentid") as string;
+            const bms = formData.get("bms") as string;
 
-        const name = formData.get("name") as string; // Access form fields
-        const number = formData.get("number") as string;
-
-        const response = await fetch('/api/agency/new', {
-            method: 'POST',
-            body: JSON.stringify({
-                name,
-                number,
+            const response = await fetch ('/api/equipment/new',{
+                method : 'POST',
+                body : JSON.stringify({
+                    idcal,
+                    bms,
+                    equipmentid,
+                })
             })
-        })
-        const data = await response.json()
-        console.log(data);
-        mutate(`/api/technician/agencys?page=${page}`)
-        onClose()
-    }
+            const data = await response.json()
+            console.log(data);
+            mutate(`/api/admin/get/equipments?page=${page}`)
+            onClose() 
+        }
     const handleDelete = async (id: string) => {
-        const promise = fetch("/api/agency/remove", {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then(async (response) => {
-                const result = await response.json();
-                if (response.ok) {
-                    return result.message || 'ลบหน่วยงานสำเร็จ';
-                } else {
-                    throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
-                }
-            })
-            .catch((error) => {
-                throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบหน่วยงาน');
-            });
-
-        toast.promise(
-            promise,
-            {
-                pending: "กำลังลบหน่วยงาน...",
-                success: {
-                    render({ data }) {
-                        mutate(`/api/technician/agencys?page=${page}`)
-                        return data;
-                    }
-                },
-                error: {
-                    render({ data }: any) {
-                        return data.message;
-                    }
-                }
-            }
-        );
-    }
+            const promise = fetch("/api/equipment/remove", {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({id}),
+                    })
+                        .then(async (response) => {
+                            const result = await response.json();
+                            if (response.ok) {
+                                return result.message || 'ลบครุภัณฑ์สำเร็จ';
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบครุภัณฑ์');
+                            }
+                        })
+                        .catch((error) => {
+                            throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบครุภัณฑ์');
+                        });
+            
+                    toast.promise(
+                        promise,
+                        {
+                            pending: "กำลังลบครุภัณฑ์...",
+                            success: {
+                                render({ data }) {
+                                    mutate(`/api/admin/get/equipments?page=${page}`)
+                                    return data;
+                                }
+                            },
+                            error: {
+                                render({ data } : any) {
+                                    return data.message;
+                                }
+                            }
+                        }
+                    );
+        }
 
     return (
-
         <><div className="flex justify-end mb-4">
-            <Button onPress={onOpen} color="success" variant="solid" className="text-white">
-                + เพิ่มหน่วยงาน
-            </Button>
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Button onPress={onOpen} color="success" variant="solid" className="text-white">
+          + เพิ่มครุภัณฑ์
+        </Button>
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">เพิ่มหน่วยงาน</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">เพิ่มครุภัณฑ์</ModalHeader>
                             <ModalBody>
                                 <Form
                                     className="w-full flex flex-col gap-4 mb-4"
@@ -125,31 +126,42 @@ export default function Agencys() {
                                 >
                                     <Input
                                         isRequired
-                                        label="หมายเลขหน่วยงาน"
+                                        label="ไอดีครุภัณฑ์"
                                         labelPlacement="outside"
-                                        name="number"
+                                        name="idcal"
                                         type="text"
                                         variant="bordered"
-                                        placeholder="หมายเลขหน่วยงาน"
+                                        placeholder="ไอดีครุภัณฑ์"
                                         errorMessage="กรุณากรอกข้อมูลในช่องนี้"
                                         size="lg"
                                     />
 
                                     <Input
                                         isRequired
-                                        label="ชื่อหน่วยงาน"
+                                        label="หมายเลขครุภัณฑ์"
                                         labelPlacement="outside"
-                                        name="name"
+                                        name="equipmentid"
                                         type="text"
                                         variant="bordered"
-                                        placeholder="ชื่อหน่วยงาน"
+                                        placeholder="หมายเลขครุภัณฑ์"
                                         errorMessage="กรุณากรอกข้อมูลในช่องนี้"
                                         size="lg"
                                     />
-
+                                    <Input
+                                        isRequired
+                                        label="ยี่ห้อ/รุ่น/ขนาด"
+                                        labelPlacement="outside"
+                                        name="bms"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="ยี่ห้อ/รุ่น/ขนาด"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+                                    
                                     <div className="w-full">
                                         <Button color="success" type="submit" radius="sm" className="text-white w-full">
-                                            เพิ่มหน่วยงาน
+                                        เพิ่มครุภัณฑ์
                                         </Button>
                                     </div>
                                 </Form>
@@ -158,8 +170,8 @@ export default function Agencys() {
                     )}
                 </ModalContent>
             </Modal>
-        </div>
-            <div className="flex flex-col gap-3">
+      </div>
+      <div className="flex flex-col gap-3">
                 <Table
                     aria-label="Example static collection table"
                     color="primary"
@@ -179,8 +191,10 @@ export default function Agencys() {
                     ) : null}
                 >
                     <TableHeader>
-                        <TableColumn className="text-base">หมายเลขหน่วยงาน</TableColumn>
-                        <TableColumn className="text-base">ชื่อหน่วยงาน</TableColumn>
+                        <TableColumn className="text-base">ไอดีครุภัณฑ์</TableColumn>
+                        <TableColumn className="text-base">หมายเลขครุภัณฑ์</TableColumn>
+                        <TableColumn className="text-base">ยี่ห้อ/รุ่น/ขนาด</TableColumn>
+                        <TableColumn className="text-base">ลงทะเบียนเมื่อ</TableColumn>
                         <TableColumn><></></TableColumn>
                     </TableHeader>
                     <TableBody
@@ -188,11 +202,13 @@ export default function Agencys() {
                         loadingState={loadingState}
                         emptyContent={"ไม่มีข้อมูลที่จะแสดง"}
                     >
-                        {data?.data.results.map((v: Agency, i: number) => {
+                        {data?.data.results.map((v: Equipment, i: number) => {
                             return (
                                 <TableRow key={i}>
-                                    <TableCell className="text-base">{v.number}</TableCell>
-                                    <TableCell className="text-base">{v.name}</TableCell>
+                                    <TableCell className="text-base">{v.idCal}</TableCell>
+                                    <TableCell className="text-base">{v.equipmentId}</TableCell>
+                                    <TableCell className="text-base">{v.bms}</TableCell>
+                                    <TableCell className="text-base">{formatDateTime(v.createdAt)}</TableCell>
                                     <TableCell>
                                         <div className="relative flex items-center gap-2">
                                             <Tooltip content="ดูรายละเอียด">

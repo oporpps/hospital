@@ -6,11 +6,14 @@ import { FaBars } from "react-icons/fa6";
 import SignIn from "@/components/specific/signin";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
 
     const toggle = useDrawer((state) => state.toggle);
     const { status, data } = useSession();
+    
+    const router = useRouter()
 
     return (
         <NavbarMain className="bg-[#198754]" maxWidth="full">
@@ -41,7 +44,7 @@ export default function Navbar() {
                             </DropdownItem>
                             <DropdownItem href="/technician" key="dashboard">แดชบอร์ด</DropdownItem>
                             <DropdownItem key="settings">การตั้งค่า</DropdownItem>
-                            <DropdownItem key="logout" color="danger" onPress={async () => signOut({ redirect: true })}>
+                            <DropdownItem key="logout" color="danger" onPress={async () => {signOut({ redirect: false });router.replace('/')}}>
                                 ออกจากระบบ
                             </DropdownItem>
                         </DropdownMenu>

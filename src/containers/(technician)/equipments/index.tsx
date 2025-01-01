@@ -22,7 +22,7 @@ import {
 } from "@nextui-org/react";
 import { FaRegEye } from "react-icons/fa6";
 import { Equipment } from "@prisma/client";
-import useSWR from "swr";
+import useSWR,{mutate} from "swr";
 import { fetcher } from "@/utils/fetch";
 import { formatDateTime } from "@/utils/format";
 import { LuPencilLine } from "react-icons/lu";
@@ -45,24 +45,64 @@ export default function Equipments() {
 
     const loadingState = isLoading  ? "loading" : "idle";
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen, onOpen, onOpenChange,onClose } = useDisclosure();
     
     const handleSubmit = async (formData: FormData) => {
     
-            const username = formData.get("username") as string; // Access form fields
-            const password = formData.get("password") as string;
-    
-            const response = await signIn("credentials", {
-                redirect: false,
-                username: username,
-                password: password,
-            });
-    
-            if (response?.error) {
-                toast.error(response?.error)
-            } else {
-                toast.success("สำเร็จ");
-            }
+            const idcal = formData.get("idcal") as string; // Access form fields
+            const equipmentid = formData.get("equipmentid") as string;
+            const bms = formData.get("bms") as string;
+
+            const response = await fetch ('/api/equipment/new',{
+                method : 'POST',
+                body : JSON.stringify({
+                    idcal,
+                    bms,
+                    equipmentid,
+                })
+            })
+            const data = await response.json()
+            console.log(data);
+            mutate(`/api/technician/equipments?page=${page}`)
+            onClose() 
+        }
+    const handleDelete = async (id: string) => {
+            const promise = fetch("/api/equipment/remove", {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({id}),
+                    })
+                        .then(async (response) => {
+                            const result = await response.json();
+                            if (response.ok) {
+                                return result.message || 'ลบครุภัณฑ์สำเร็จ';
+                            } else {
+                                throw new Error(result.message || 'เกิดข้อผิดพลาดในการลบครุภัณฑ์');
+                            }
+                        })
+                        .catch((error) => {
+                            throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบครุภัณฑ์');
+                        });
+            
+                    toast.promise(
+                        promise,
+                        {
+                            pending: "กำลังลบครุภัณฑ์...",
+                            success: {
+                                render({ data }) {
+                                    mutate(`/api/technician/equipments?page=${page}`)
+                                    return data;
+                                }
+                            },
+                            error: {
+                                render({ data } : any) {
+                                    return data.message;
+                                }
+                            }
+                        }
+                    );
         }
 
     return (
@@ -111,7 +151,7 @@ export default function Equipments() {
                                         isRequired
                                         label="ยี่ห้อ/รุ่น/ขนาด"
                                         labelPlacement="outside"
-                                        name="password"
+                                        name="bms"
                                         type="text"
                                         variant="bordered"
                                         placeholder="ยี่ห้อ/รุ่น/ขนาด"
@@ -182,7 +222,14 @@ export default function Equipments() {
                                                 </span>
                                             </Tooltip>
                                             <Tooltip content="ลบ">
-                                                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                                                <span
+                                                    className="text-lg text-danger cursor-pointer active:opacity-50"
+                                                    onClick={() => {
+                                                        if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?")) {
+                                                            handleDelete(v.id);
+                                                        }
+                                                    }}
+                                                >
                                                     <FaRegTrashAlt />
                                                 </span>
                                             </Tooltip>
