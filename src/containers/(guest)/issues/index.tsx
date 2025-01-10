@@ -130,7 +130,7 @@ export default function Issues() {
                                     <p>หน่วยงาน: {(selectedIssue as any).agency.name}</p>
                                     <p>ผู้แจ้งซ่อม: {selectedIssue.informer}</p>
                                     <p>วันแจ้งซ่อม: {formatDateTime(selectedIssue.createdAt)}</p>
-                                    <p>สถานะ: {selectedIssue.status}</p>
+                                    <p>สถานะ: {selectedIssue.status==="PENDING" ? "รอดำเนินการ": (selectedIssue.status === "IN_PROGRESS" ? "กำลังดำเนินการ" : "เสร็จสิ้น")}</p>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="danger" variant="light" onPress={() => {
