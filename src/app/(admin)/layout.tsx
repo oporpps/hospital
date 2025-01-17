@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css"
 import { Noto_Sans_Thai } from 'next/font/google';
-import Layout from "@/containers/(technician)/layout";
+import Layout from "@/containers/(admin)/layout";
 import { ToastContainer } from "react-toastify";
 import { getServerSession } from "next-auth/next";
 import { redirect, RedirectType } from "next/navigation";
@@ -25,6 +25,8 @@ export default async function RootLayout({
     const session = await getServerSession(authOptions);
 
     if (!session) redirect("/", RedirectType.replace);
+
+    // if (session.user.role !== "ADMIN") redirect("/", RedirectType.replace);
 
     return (
         <html lang="th">

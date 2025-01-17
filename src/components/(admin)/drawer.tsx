@@ -27,8 +27,8 @@ export default function Drawer() {
                     </Link>
                 </CardHeader>
                 <CardBody className="flex items-center space-y-4">
-                    <Link href="/technician/equipment" className="text-white" size="lg">จัดการครุภัณฑ์</Link>
-                    <Link href="/technician/agency" className="text-white" size="lg">จัดการหน่วยงาน</Link>
+                    <Link href="/admin/equipment" className="text-white" size="lg">จัดการครุภัณฑ์</Link>
+                    <Link href="/admin/agency" className="text-white" size="lg">จัดการหน่วยงาน</Link>
                 </CardBody>
             </Card>
         </>

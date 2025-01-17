@@ -15,6 +15,7 @@ export async function GET(req: Request) {
         take: limit,
         include: {
             agency: true,
+            equipment: true,
         },
         orderBy: {
             createdAt: 'desc',
