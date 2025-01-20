@@ -52,6 +52,11 @@ export default function Equipments() {
             const idcal = formData.get("idcal") as string; // Access form fields
             const equipmentid = formData.get("equipmentid") as string;
             const bms = formData.get("bms") as string;
+            const price = formData.get("price") as string;
+            const doc = formData.get("doc") as string;
+            const get = formData.get("get") as string;
+            const seller = formData.get("seller") as string;
+            const responsible = formData.get("responsible") as string;
 
             const response = await fetch ('/api/equipment/new',{
                 method : 'POST',
@@ -59,6 +64,11 @@ export default function Equipments() {
                     idcal,
                     bms,
                     equipmentid,
+                    price,
+                    doc,
+                    get,
+                    seller,
+                    responsible,
                 })
             })
             const data = await response.json()
@@ -158,7 +168,61 @@ export default function Equipments() {
                                         errorMessage="กรุณากรอกข้อมูลในช่องนี้"
                                         size="lg"
                                     />
-                                    
+                                    <Input
+                                        isRequired
+                                        label="ราคา"
+                                        labelPlacement="outside"
+                                        name="price"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="ราคา"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="วันที่ได้มา"
+                                        labelPlacement="outside"
+                                        name="doc"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="วันที่ได้มา"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="วิธีการได้มา"
+                                        labelPlacement="outside"
+                                        name="get"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="วิธีการได้มา"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="ผู้จำหน่าย"
+                                        labelPlacement="outside"
+                                        name="seller"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="ผู้จำหน่าย"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
+                                     <Input
+                                        isRequired
+                                        label="ผู้รับผิดชอบ"
+                                        labelPlacement="outside"
+                                        name="responsible"
+                                        type="text"
+                                        variant="bordered"
+                                        placeholder="ผู้รับผิดชอบ"
+                                        errorMessage="กรุณากรอกข้อมูลในช่องนี้"
+                                        size="lg"
+                                    />
                                     <div className="w-full">
                                         <Button color="success" type="submit" radius="sm" className="text-white w-full">
                                         เพิ่มครุภัณฑ์
@@ -194,7 +258,8 @@ export default function Equipments() {
                         <TableColumn className="text-base">ไอดีครุภัณฑ์</TableColumn>
                         <TableColumn className="text-base">หมายเลขครุภัณฑ์</TableColumn>
                         <TableColumn className="text-base">ยี่ห้อ/รุ่น/ขนาด</TableColumn>
-                        <TableColumn className="text-base">ลงทะเบียนเมื่อ</TableColumn>
+                        <TableColumn className="text-base">วันที่ได้มา</TableColumn>
+                        <TableColumn className="text-base">ผู้รับผิดชอบ</TableColumn>
                         <TableColumn><></></TableColumn>
                     </TableHeader>
                     <TableBody
@@ -205,10 +270,11 @@ export default function Equipments() {
                         {data?.data.results.map((v: Equipment, i: number) => {
                             return (
                                 <TableRow key={i}>
-                                    <TableCell className="text-base">{v.idCal}</TableCell>
+                                     <TableCell className="text-base">{v.idCal}</TableCell>
                                     <TableCell className="text-base">{v.equipmentId}</TableCell>
                                     <TableCell className="text-base">{v.bms}</TableCell>
-                                    <TableCell className="text-base">{formatDateTime(v.createdAt)}</TableCell>
+                                    <TableCell className="text-base">20/1/2568</TableCell>
+                                    <TableCell className="text-base">พูลสวัสดิ์</TableCell>
                                     <TableCell>
                                         <div className="relative flex items-center gap-2">
                                             <Tooltip content="ดูรายละเอียด">

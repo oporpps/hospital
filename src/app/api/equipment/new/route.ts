@@ -11,6 +11,11 @@ export async function POST(req: Request) {
                 idCal: body.idcal,
                 equipmentId: body.equipmentid,
                 bms: body.bms,
+                price: body.price,
+                doc: body.doc,
+                get: body.get,
+                seller: body.seller,
+                responsible: body.responsible,
             },
         });
 

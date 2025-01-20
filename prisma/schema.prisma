@@ -25,13 +25,18 @@ model User {
 
 // ครุภัณฑ์
 model Equipment {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  idCal       String   @unique // ID ครุภัณฑ์
-  equipmentId String   @unique // หมายเลขครุภัณฑ์
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  idCal       String    @unique // ID ครุภัณฑ์
+  equipmentId String    @unique // หมายเลขครุภัณฑ์
   bms         String // ยี่ห้อ/รุ่น/ขนาด
+  price       Float? // ราคา
+  doc         DateTime? // วันที่ได้มา
+  get         String? // วิธีการได้มา
+  seller      String? //ผุ้จำหน่าย
+  responsible String? //ผู้รับผิดชอบ
   serialNo    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   Issue       Issue[]
 }
 
